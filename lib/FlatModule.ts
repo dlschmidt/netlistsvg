@@ -22,17 +22,26 @@ export class FlatModule {
     public nodes: Cell[];
     public wires: Wire[];
 
-    constructor(netlist: Yosys.Netlist) {
-        this.moduleName = null;
-        _.forEach(netlist.modules, (mod: Yosys.Module, name: string) => {
-            if (mod.attributes && Number(mod.attributes.top) === 1) {
-                this.moduleName = name;
+    constructor(netlist: Yosys.Netlist, moduleName: string) {
+        if (moduleName) {
+            // if the module name was specified by the user
+            if (!Object.keys(netlist.modules).includes(moduleName)) {
+                throw new Error(`${moduleName} not found in modules`);   
             }
-        });
-        // Otherwise default the first one in the file...
-        if (this.moduleName == null) {
-            this.moduleName = Object.keys(netlist.modules)[0];
+            this.moduleName = moduleName;
+        } else {
+            _.forEach(netlist.modules, (mod: Yosys.Module, name: string) => {
+                if (mod.attributes && Number(mod.attributes.top) === 1) {
+                    this.moduleName = name;
+                }
+            });
+            
+            // Otherwise default the first one in the file...
+            if (this.moduleName == null) {
+                this.moduleName = Object.keys(netlist.modules)[0];
+            }
         }
+        
         const top = netlist.modules[this.moduleName];
         const ports = _.map(top.ports, Cell.fromPort);
         const cells = _.map(top.cells, (c, key) => Cell.fromYosysCell(c, key));
