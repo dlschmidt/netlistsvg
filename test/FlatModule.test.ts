@@ -12,14 +12,14 @@ import Skin from '../lib/Skin';
  * Helper function for tests that use test files
  * @param testFile the name of the test case, don't include path or extension
  */
-function createFlatModule(testFile: string): FlatModule {
-    const testPath = path.join(__dirname,'digital', testFile + '.json');
+function createFlatModule(testFile: string, moduleName?: string): FlatModule {
+    const testPath = path.join(__dirname, 'digital', testFile + '.json');
     const defaultSkin = path.join(__dirname, '../lib/default.svg');
     const testStr = fs.readFileSync(testPath).toString();
     const netlist: Yosys.Netlist = json5.parse(testStr);
     const skin = onml.parse(fs.readFileSync(defaultSkin).toString());
     Skin.skin = skin;
-    return new FlatModule(netlist);
+    return new FlatModule(netlist, moduleName);
 }
 
 /**
@@ -33,15 +33,15 @@ test('split join', () => {
     const nodes = flatModule.nodes;
     // should have 3 more nodes, one split, two joins
     expect(nodes.length - numStartNodes).toEqual(3);
-    const splits = nodes.filter( (node: Cell) => node.Type === '$_split_');
+    const splits = nodes.filter((node: Cell) => node.Type === '$_split_');
     expect(splits.length).toEqual(1);
     const split = splits[0];
     // split should have 3 outputs
     expect(split.OutputPorts.length).toEqual(3);
-    const joins = nodes.filter( (node: Cell) => node.Type === '$_join_');
+    const joins = nodes.filter((node: Cell) => node.Type === '$_join_');
     expect(joins.length).toEqual(2);
     // both joins should have two inputs
-    joins.forEach( (join: Cell) => expect(join.InputPorts.length).toEqual(2));
+    joins.forEach((join: Cell) => expect(join.InputPorts.length).toEqual(2));
 });
 
 /**

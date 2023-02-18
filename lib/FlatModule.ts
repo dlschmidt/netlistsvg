@@ -22,11 +22,11 @@ export class FlatModule {
     public nodes: Cell[];
     public wires: Wire[];
 
-    constructor(netlist: Yosys.Netlist, moduleName: string) {
+    constructor(netlist: Yosys.Netlist, moduleName?: string) {
         if (moduleName) {
             // if the module name was specified by the user
-            if (!Object.keys(netlist.modules).includes(moduleName)) {
-                throw new Error(`${moduleName} not found in modules`);   
+            if (!netlist.modules[moduleName]) {
+                throw new Error(`${moduleName} not found in modules`);
             }
             this.moduleName = moduleName;
         } else {
@@ -35,13 +35,13 @@ export class FlatModule {
                     this.moduleName = name;
                 }
             });
-            
+
             // Otherwise default the first one in the file...
             if (this.moduleName == null) {
                 this.moduleName = Object.keys(netlist.modules)[0];
             }
         }
-        
+
         const top = netlist.modules[this.moduleName];
         const ports = _.map(top.ports, Cell.fromPort);
         const cells = _.map(top.cells, (c, key) => Cell.fromYosysCell(c, key));
@@ -109,7 +109,7 @@ export class FlatModule {
             const drivers: FlatPort[] = driversByNet[net] || [];
             const riders: FlatPort[] = ridersByNet[net] || [];
             const laterals: FlatPort[] = lateralsByNet[net] || [];
-            const wire: Wire = { netName: net, drivers, riders, laterals};
+            const wire: Wire = { netName: net, drivers, riders, laterals };
             drivers.concat(riders).concat(laterals).forEach((port) => {
                 port.wire = wire;
             });
@@ -166,8 +166,8 @@ export function addToDefaultDict(dict: any, key: string, value: any): void {
 // string (for labels), that represents an index
 // or range of indices.
 function getIndicesString(bitstring: string,
-                          query: string,
-                          start: number): string {
+    query: string,
+    start: number): string {
     const splitStart: number = _.max([bitstring.indexOf(query), start]);
     const startIndex: number = bitstring.substring(0, splitStart).split(',').length - 1;
     const endIndex: number = startIndex + query.split(',').length - 3;
@@ -181,12 +181,12 @@ function getIndicesString(bitstring: string,
 
 // gather splits and joins
 function gather(inputs: string[],  // all inputs
-                outputs: string[], // all outputs
-                toSolve: string, // an input array we are trying to solve
-                start: number,   // index of toSolve to start from
-                end: number,     // index of toSolve to end at
-                splits: SplitJoin,  // container collecting the splits
-                joins: SplitJoin): void {  // container collecting the joins
+    outputs: string[], // all outputs
+    toSolve: string, // an input array we are trying to solve
+    start: number,   // index of toSolve to start from
+    end: number,     // index of toSolve to end at
+    splits: SplitJoin,  // container collecting the splits
+    joins: SplitJoin): void {  // container collecting the joins
     // remove myself from outputs list if present
     const outputIndex: number = outputs.indexOf(toSolve);
     if (outputIndex !== -1) {

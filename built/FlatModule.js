@@ -5,17 +5,25 @@ var Skin_1 = require("./Skin");
 var Cell_1 = require("./Cell");
 var _ = require("lodash");
 var FlatModule = /** @class */ (function () {
-    function FlatModule(netlist) {
+    function FlatModule(netlist, moduleName) {
         var _this = this;
-        this.moduleName = null;
-        _.forEach(netlist.modules, function (mod, name) {
-            if (mod.attributes && Number(mod.attributes.top) === 1) {
-                _this.moduleName = name;
+        if (moduleName) {
+            // if the module name was specified by the user
+            if (!netlist.modules[moduleName]) {
+                throw new Error("".concat(moduleName, " not found in modules"));
             }
-        });
-        // Otherwise default the first one in the file...
-        if (this.moduleName == null) {
-            this.moduleName = Object.keys(netlist.modules)[0];
+            this.moduleName = moduleName;
+        }
+        else {
+            _.forEach(netlist.modules, function (mod, name) {
+                if (mod.attributes && Number(mod.attributes.top) === 1) {
+                    _this.moduleName = name;
+                }
+            });
+            // Otherwise default the first one in the file...
+            if (this.moduleName == null) {
+                this.moduleName = Object.keys(netlist.modules)[0];
+            }
         }
         var top = netlist.modules[this.moduleName];
         var ports = _.map(top.ports, Cell_1.default.fromPort);
