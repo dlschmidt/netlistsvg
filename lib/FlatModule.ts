@@ -17,18 +17,41 @@ export interface Wire {
     laterals: FlatPort[];
 }
 
+function matchRuleShort(str: string, rule: string) {
+    var escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
+}
+
 export class FlatModule {
     public moduleName: string;
     public nodes: Cell[];
     public wires: Wire[];
 
-    constructor(netlist: Yosys.Netlist, moduleName?: string) {
-        if (moduleName) {
+    constructor(netlist: Yosys.Netlist, userModuleName?: string) {
+        this.moduleName = this.findModuleName(netlist, userModuleName);
+
+        const top = netlist.modules[this.moduleName];
+        const ports = _.map(top.ports, Cell.fromPort);
+        const cells = _.map(top.cells, (c, key) => Cell.fromYosysCell(c, key));
+        this.nodes = cells.concat(ports);
+        // populated by createWires
+        this.wires = [];
+    }
+
+    private findModuleName(netlist: Yosys.Netlist, userModuleName?: string) {
+        if (userModuleName) {
             // if the module name was specified by the user
-            if (!netlist.modules[moduleName]) {
-                throw new Error(`${moduleName} not found in modules`);
+            if (netlist.modules[userModuleName]) {
+                return userModuleName;
             }
-            this.moduleName = moduleName;
+
+            for (let moduleName in netlist.modules) {
+                if (matchRuleShort(moduleName, userModuleName)) {
+                    return moduleName;
+                }
+            }
+
+            throw new Error(`${userModuleName} not found in modules`);
         } else {
             _.forEach(netlist.modules, (mod: Yosys.Module, name: string) => {
                 if (mod.attributes && Number(mod.attributes.top) === 1) {
@@ -41,14 +64,6 @@ export class FlatModule {
                 this.moduleName = Object.keys(netlist.modules)[0];
             }
         }
-        console.log(this.moduleName);
-
-        const top = netlist.modules[this.moduleName];
-        const ports = _.map(top.ports, Cell.fromPort);
-        const cells = _.map(top.cells, (c, key) => Cell.fromYosysCell(c, key));
-        this.nodes = cells.concat(ports);
-        // populated by createWires
-        this.wires = [];
     }
 
     // converts input ports with constant assignments to constant nodes

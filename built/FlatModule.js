@@ -4,15 +4,33 @@ exports.removeDups = exports.addToDefaultDict = exports.arrayToBitstring = expor
 var Skin_1 = require("./Skin");
 var Cell_1 = require("./Cell");
 var _ = require("lodash");
+function matchRuleShort(str, rule) {
+    var escapeRegex = function (str) { return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"); };
+    return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
+}
 var FlatModule = /** @class */ (function () {
-    function FlatModule(netlist, moduleName) {
+    function FlatModule(netlist, userModuleName) {
+        this.moduleName = this.findModuleName(netlist, userModuleName);
+        var top = netlist.modules[this.moduleName];
+        var ports = _.map(top.ports, Cell_1.default.fromPort);
+        var cells = _.map(top.cells, function (c, key) { return Cell_1.default.fromYosysCell(c, key); });
+        this.nodes = cells.concat(ports);
+        // populated by createWires
+        this.wires = [];
+    }
+    FlatModule.prototype.findModuleName = function (netlist, userModuleName) {
         var _this = this;
-        if (moduleName) {
+        if (userModuleName) {
             // if the module name was specified by the user
-            if (!netlist.modules[moduleName]) {
-                throw new Error("".concat(moduleName, " not found in modules"));
+            if (netlist.modules[userModuleName]) {
+                return userModuleName;
             }
-            this.moduleName = moduleName;
+            for (var moduleName in netlist.modules) {
+                if (matchRuleShort(moduleName, userModuleName)) {
+                    return moduleName;
+                }
+            }
+            throw new Error("".concat(userModuleName, " not found in modules"));
         }
         else {
             _.forEach(netlist.modules, function (mod, name) {
@@ -25,14 +43,7 @@ var FlatModule = /** @class */ (function () {
                 this.moduleName = Object.keys(netlist.modules)[0];
             }
         }
-        console.log(this.moduleName);
-        var top = netlist.modules[this.moduleName];
-        var ports = _.map(top.ports, Cell_1.default.fromPort);
-        var cells = _.map(top.cells, function (c, key) { return Cell_1.default.fromYosysCell(c, key); });
-        this.nodes = cells.concat(ports);
-        // populated by createWires
-        this.wires = [];
-    }
+    };
     // converts input ports with constant assignments to constant nodes
     FlatModule.prototype.addConstants = function () {
         // find the maximum signal number
