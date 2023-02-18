@@ -14,18 +14,18 @@ require('ajv-errors')(ajv);
 if (require.main === module) {
     var argv = yargs
         .demand(1)
-        .usage('usage: $0 input_json_file [-o output_svg_file] [--skin skin_file] [--layout elk_json_file]')
+        .usage('usage: $0 input_json_file [-o output_svg_file] [--skin skin_file] [--layout elk_json_file] [--module module_name]')
         .argv;
-    main(argv._[0], argv.o, argv.skin, argv.layout);
+    main(argv._[0], argv.o, argv.skin, argv.layout, argv.module);
 }
 
-function render(skinData, netlist, outputPath, elkData) {
+function render(skinData, netlist, outputPath, elkData, moduleName) {
     lib.render(skinData, netlist, (err, svgData) => {
         if (err) throw err;
         fs.writeFile(outputPath, svgData, 'utf-8', (err) => {
             if (err) throw err;
         });
-    }, elkData);
+    }, elkData, moduleName);
 }
 
 function parseFiles(skinPath, netlistPath, elkJsonPath, callback) {
@@ -44,7 +44,7 @@ function parseFiles(skinPath, netlistPath, elkJsonPath, callback) {
     });
 }
 
-function main(netlistPath, outputPath, skinPath, elkJsonPath) {
+function main(netlistPath, outputPath, skinPath, elkJsonPath, moduleName) {
     skinPath = skinPath || path.join(__dirname, '../lib/default.svg');
     outputPath = outputPath || 'out.svg';
     var schemaPath = path.join(__dirname, '../lib/yosys.schema.json5');
@@ -54,7 +54,7 @@ function main(netlistPath, outputPath, skinPath, elkJsonPath) {
         if (!valid) {
             throw Error(JSON.stringify(ajv.errors, null, 2));
         }
-        render(skinData, netlistJson, outputPath, elkData);
+        render(skinData, netlistJson, outputPath, elkData, moduleName);
     });
 }
 

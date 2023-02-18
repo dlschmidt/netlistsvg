@@ -25,6 +25,7 @@ var FlatModule = /** @class */ (function () {
                 this.moduleName = Object.keys(netlist.modules)[0];
             }
         }
+        console.log(this.moduleName);
         var top = netlist.modules[this.moduleName];
         var ports = _.map(top.ports, Cell_1.default.fromPort);
         var cells = _.map(top.cells, function (c, key) { return Cell_1.default.fromYosysCell(c, key); });

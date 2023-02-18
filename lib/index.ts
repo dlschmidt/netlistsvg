@@ -29,8 +29,8 @@ function createFlatModule(skinData: string, yosysNetlist: Yosys.Netlist, moduleN
     return flatModule;
 }
 
-export function dumpLayout(skinData: string, yosysNetlist: Yosys.Netlist, prelayout: boolean, done: ICallback) {
-    const flatModule = createFlatModule(skinData, yosysNetlist);
+export function dumpLayout(skinData: string, yosysNetlist: Yosys.Netlist, prelayout: boolean, done: ICallback, moduleName?: string) {
+    const flatModule = createFlatModule(skinData, yosysNetlist, moduleName);
     const kgraph: ElkModel.Graph = buildElkGraph(flatModule);
     if (prelayout) {
         done(null, JSON.stringify(kgraph, null, 2));
@@ -45,8 +45,8 @@ export function dumpLayout(skinData: string, yosysNetlist: Yosys.Netlist, prelay
     });
 }
 
-export function render(skinData: string, yosysNetlist: Yosys.Netlist, done?: ICallback, elkData?: ElkModel.Graph) {
-    const flatModule = createFlatModule(skinData, yosysNetlist);
+export function render(skinData: string, yosysNetlist: Yosys.Netlist, done?: ICallback, elkData?: ElkModel.Graph, moduleName?: string) {
+    const flatModule = createFlatModule(skinData, yosysNetlist, moduleName);
     const kgraph: ElkModel.Graph = buildElkGraph(flatModule);
     const layoutProps = Skin.getProperties();
 

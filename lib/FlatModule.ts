@@ -41,6 +41,7 @@ export class FlatModule {
                 this.moduleName = Object.keys(netlist.modules)[0];
             }
         }
+        console.log(this.moduleName);
 
         const top = netlist.modules[this.moduleName];
         const ports = _.map(top.ports, Cell.fromPort);

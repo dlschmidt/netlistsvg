@@ -23,8 +23,8 @@ function createFlatModule(skinData, yosysNetlist, moduleName) {
     flatModule.createWires();
     return flatModule;
 }
-function dumpLayout(skinData, yosysNetlist, prelayout, done) {
-    var flatModule = createFlatModule(skinData, yosysNetlist);
+function dumpLayout(skinData, yosysNetlist, prelayout, done, moduleName) {
+    var flatModule = createFlatModule(skinData, yosysNetlist, moduleName);
     var kgraph = (0, elkGraph_1.buildElkGraph)(flatModule);
     if (prelayout) {
         done(null, JSON.stringify(kgraph, null, 2));
@@ -39,8 +39,8 @@ function dumpLayout(skinData, yosysNetlist, prelayout, done) {
     });
 }
 exports.dumpLayout = dumpLayout;
-function render(skinData, yosysNetlist, done, elkData) {
-    var flatModule = createFlatModule(skinData, yosysNetlist);
+function render(skinData, yosysNetlist, done, elkData, moduleName) {
+    var flatModule = createFlatModule(skinData, yosysNetlist, moduleName);
     var kgraph = (0, elkGraph_1.buildElkGraph)(flatModule);
     var layoutProps = Skin_1.default.getProperties();
     var promise;
