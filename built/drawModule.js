@@ -90,7 +90,7 @@ function drawModule(g, module) {
                             width: (e.labels[0].text.length + 2) * 6 - 2,
                             height: 9,
                             class: netName,
-                            style: 'fill: white; stroke: none',
+                            style: 'fill: black; stroke: none',
                         },
                     ], ['text',
                         {
