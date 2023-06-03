@@ -46,6 +46,9 @@ line {
 .register {
   stroke: #189fff !important;
 }
+.registerLabel {
+  fill: #189fff !important;
+}
 .module {
   stroke: #e06c75 !important;
 }
@@ -61,8 +64,8 @@ line {
 
     <path d="M0,0 L20,10 L20,30 L0,40 Z" class="$cell_id"/>
 
-    <text x="5" y="32" class="nodelabel $cell_id" s:attribute="">1</text>
-    <text x="5" y="13" class="nodelabel $cell_id" s:attribute="">0</text>
+    <text x="5" y="32" class="nodelabel $cell_id splitjoinBodyLabel" s:attribute="">1</text>
+    <text x="5" y="13" class="nodelabel $cell_id splitjoinBodyLabel" s:attribute="">0</text>
     <g s:x="0" s:y="10" s:pid="A"/>
     <g s:x="0" s:y="30" s:pid="B"/>
     <g s:x="10" s:y="35" s:pid="S"/>
@@ -78,8 +81,8 @@ line {
     <path d="M4,2 L4,0 L22,9 L22,31 L4,40 L4,38" class="$cell_id"/>
     <path d="M8,2 L8,0 L24,8 L24,32 L8,40 L8,38" class="$cell_id"/>
 
-    <text x="5" y="32" class="nodelabel $cell_id" s:attribute="">1</text>
-    <text x="5" y="13" class="nodelabel $cell_id" s:attribute="">0</text>
+    <text x="5" y="32" class="nodelabel $cell_id splitjoinBodyLabel" s:attribute="">1</text>
+    <text x="5" y="13" class="nodelabel $cell_id splitjoinBodyLabel" s:attribute="">0</text>
     <g s:x="-1" s:y="10" s:pid="A"/>
     <g s:x="-1" s:y="30" s:pid="B"/>
     <g s:x="12" s:y="38" s:pid="S"/>
@@ -511,6 +514,8 @@ line {
   </g>
 
   <g s:type="dff" class="register" transform="translate(50,300)" s:width="30" s:height="40">
+    <text x="15" y="-4" class="nodelabel registerLabel $cell_id" s:attribute="ref">input</text>
+
     <s:alias val="$dff"/>
     <s:alias val="$_DFF_"/>
     <s:alias val="$_DFF_P_"/>
@@ -535,6 +540,8 @@ line {
   </g>
 
   <g s:type="dff-bus" class="register" transform="translate(100,300)" s:width="34" s:height="44">
+    <text x="15" y="-4" class="nodelabel registerLabel $cell_id" s:attribute="ref">input</text>
+    
     <s:alias val="$dff-bus"/>
     <s:alias val="$_DFF_-bus"/>
     <s:alias val="$_DFF_P_-bus"/>
